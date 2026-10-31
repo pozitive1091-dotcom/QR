@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <!-- Фиксируем масштаб, чтобы зоны не съезжали при повороте телефона -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Карта объекта — Интерактивная</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* Контейнер строго 1000px — как размер твоей карты */
+    .map-container {
+      position: relative;
+      width: 1000px;
+      max-width: 100%;
+      margin: 0 auto;
+      overflow-x: auto; /* Горизонтальный скролл, если экран уже 1000px */
+      overflow-y: hidden;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      border-radius: 8px;
+      background: #fff;
+      padding-bottom: 20px; /* Место под полосу прокрутки */
+    }
+
+    /* Картинка строго 1000x564, без масштабирования */
+    img.map-image {
+      display: block;
+      width: 1000px;
+      height: 564px;
+      max-width: none;
+      pointer-events: none; /* Картинка не перехватывает клики */
+    }
+
+    /* Зоны: абсолютное позиционирование по пикселям */
+    .zone {
+      position: absolute;
+      cursor: pointer;
+      border: 3px solid #d32f2f;
+      background: rgba(216, 27, 33, 0.3);
+      transition: transform 0.15s, filter 0.15s;
+      z-index: 10;
+      box-sizing: border-box;
+      pointer-events: auto;
+    }
+
+    .zone:hover {
+      transform: scale(1.03);
+      filter: brightness(1.1);
+      z-index: 20;
+      border-color: #b71c1c;
+    }
+
+    /* Всплывающее окно */
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 90%;
+      max-width: 600px;
+      background: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+      z-index: 1000;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+    .popup h2 { margin: 0 0 14px 0; color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+    .close-btn { float: right; font-size: 28px; line-height: 1; cursor: pointer; color: #999; }
+    .close-btn:hover { color: #333; }
+
+    .info-block { margin: 14px 0; }
+    .info-label { font-weight: bold; color: #555; display: block; margin-bottom: 4px; }
+    .img-holder { margin-top: 20px; text-align: center; }
+    .img-holder img { max-width: 100%; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+
+    .legend {
+      text-align: center;
+      margin-top: 18px;
+      color: #666;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Карта объекта</h1>
+
+  <div class="map-container">
+    <!-- Твоя ссылка на карту с GitHub -->
+    <img src="https://github.com/pozitive1091-dotcom/QR/blob/main/images/map.png?raw=true" alt="Карта объекта" class="map-image">
+
+    <!-- Зона 1 -->
+    <div class="zone" style="top: 155px; left: 27px; width: 100px; height: 144px;"
+         onclick="openPopup('Зона 1', 'Риск удара, падение предметов. СИЗ: каска, жилет.', 'Иванов И.И.', '+7 (999) 111-22-33', '')">
+    </div>
+
+    <!-- Зона 2 -->
+    <div class="zone" style="top: 303px; left: 27px; width: 100px; height: 145px;"
+         onclick="openPopup('Зона 2', 'Ограниченное пространство, защемление.', 'Петров П.П.', '+7 (999) 444-55-66', '')">
+    </div>
+
+    <!-- Зона 3 -->
+    <div class="zone" style="top: 31px; left: 457px; width: 135px; height: 144px;"
+         onclick="openPopup('Зона 3', 'Падение с высоты. Страховочная привязь.', 'Сидоров С.С.', '+7 (999) 777-88-99', '')">
+    </div>
+
+    <!-- Зона 4 -->
+    <div class="zone" style="top: 31px; left: 597px; width: 135px; height: 144px;"
+         onclick="openPopup('Зона 4', 'Высокое напряжение. Доступ по наряду.', 'Кузнецов К.К.', '+7 (999) 222-33-44', '')">
+    </div>
+
+    <!-- Зона 5 -->
+    <div class="zone" style="top: 32px; left: 737px; width: 135px; height: 143px;"
+         onclick="openPopup('Зона 5', 'Разгерметизация трубопроводов.', 'Морозов М.М.', '+7 (999) 555-66-77', '')">
+    </div>
+
+    <!-- Зона 6 -->
+    <div class="zone" style="top: 314px; left: 584px; width: 297px; height: 173px;"
+         onclick="openPopup('Зона 6', 'Риск возгорания. Контроль ДВК.', 'Новиков Н.Н.', '+7 (999) 888-99-00', '')">
+    </div>
+
+    <!-- Зона 8 -->
+    <div class="zone" style="top: 385px; left: 887px; width: 97px; height: 142px;"
+         onclick="openPopup('Зона 8', 'Удар током. Проверка напряжения.', 'Павлов П.П.', '+7 (999) 666-77-88', '')">
+    </div>
+
+    <!-- Зона 9 -->
+    <div class="zone" style="top: 95px; left: 235px; width: 137px; height: 145px;"
+         onclick="openPopup('Зона 9', 'Ожоги. Термостойкие перчатки.', 'Семёнов С.С.', '+7 (999) 123-45-67', '')">
+    </div>
+
+    <!-- Зона 10 -->
+    <div class="zone" style="top: 245px; left: 235px; width: 137px; height: 144px;"
+         onclick="openPopup('Зона 10', 'Падение груза. Ограждение лентой.', 'Романов Р.Р.', '+7 (999) 999-00-11', '')">
+    </div>
+
+    <!-- Зона 11 -->
+    <div class="zone" style="top: 393px; left: 235px; width: 137px; height: 104px;"
+         onclick="openPopup('Зона 11', 'Порезы. Защитные рукавицы.', 'Тихомиров Т.Т.', '+7 (999) 765-43-21', '')">
+    </div>
+  </div>
+
+  <div class="legend">
+    🔴 <b>Опасные зоны</b> — клик для просмотра деталей.
+  </div>
+
+  <!-- Модальное окно -->
+  <div id="popup" class="popup">
+    <span class="close-btn" onclick="closePopup()">&times;</span>
+    <h2 id="p-title"></h2>
+    <div class="info-block">
+      <span class="info-label">Опасности / Инструкция:</span>
+      <span id="p-danger"></span>
+    </div>
+    <div class="info-block">
+      <span class="info-label">Ответственный:</span>
+      <span id="p-contact"></span>
+    </div>
+    <div class="info-block">
+      <span class="info-label">Телефон:</span>
+      <span id="p-phone"></span>
+    </div>
+    <div class="img-holder">
+      <img id="p-img" src="" alt="Фото зоны" style="display:none;">
+    </div>
+  </div>
+
+  <script>
+    const popup = document.getElementById('popup');
+    const pTitle = document.getElementById('p-title');
+    const pDanger = document.getElementById('p-danger');
+    const pContact = document.getElementById('p-contact');
+    const pPhone = document.getElementById('p-phone');
+    const pImg = document.getElementById('p-img');
+
+    function openPopup(title, danger, contact, phone, imgSrc) {
+      pTitle.textContent = title;
+      pDanger.textContent = danger;
+      pContact.textContent = contact || 'Не указано';
+      pPhone.textContent = phone || '';
+
+      if (imgSrc) {
+        pImg.src = imgSrc;
+        pImg.style.display = 'block';
+      } else {
+        pImg.style.display = 'none';
+      }
+      popup.style.display = 'block';
+    }
+
+    function closePopup() {
+      popup.style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+      if (event.target == popup) {
+        popup.style.display = "none";
+      }
+    }
+  </script>
+</body>
+</html>
